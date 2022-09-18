@@ -1,39 +1,51 @@
 const logger = require('../utils/logger');
-const ApiClient = require('../binance/api-client/index');
+const BinanceSyncerClient = require('../binance/client');
 
 
-class OrderBookSyncerService {
+class BinanceOrderbooksSyncerService {
   constructor(config) {
-    this.apiClient = new ApiClient(config);
-    this.wsClient = null;
+    this.client = new BinanceSyncerClient(config);
   }
 
   /**
-   * Start synchronization orderbook data by websocket
+   * Sync orderbooks
    *
-   * @returns {Promise<void>}
+   * @return {Promise<void>}
    */
   async startOrderbooksSync() {
     try {
-      logger.info('Start sync orderbook data');
-      // todo: complete this method
-    } catch (e) {
-      e.message = `orderbookSyncerService:startOrderbooksSync() -> ${e.message}`;
+      await this.client.initOrderbooksSync();
+    } catch (error) {
+      logger.error('Cannot start sync binance orderbooks', error.message);
 
-      throw new Error(e);
+      throw error;
     }
   }
 
   async stopOrderbooksSync() {
     try {
-      logger.info('Stop sync orderbook data');
-      // todo: complete this method
-    } catch (e) {
-      e.message = `orderbookSyncerService:stopOrderbooksSync() -> ${e.message}`;
+      await this.client.stopOrderbooksSync();
+    } catch (error) {
+      logger.error('Cannot stop binance orderbooks sync', error.message);
 
-      throw new Error(e);
+      throw error;
+    }
+  }
+
+  /**
+   * Clean orderbooks
+   *
+   * @returns {Promise<void>}
+   */
+  async cleanOrderbooks() {
+    try {
+      await this.client.cleanAllOrderbooks();
+    } catch (error) {
+      logger.error('Cannot clean binance orderbooks', error.message);
+
+      throw error;
     }
   }
 }
 
-module.exports = OrderBookSyncerService;
+module.exports = BinanceOrderbooksSyncerService;
